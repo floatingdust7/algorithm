@@ -1,0 +1,62 @@
+#include <stdio.h>
+#include <limits.h>
+#define LENGTH    6
+
+/*
+ *p[i]:矩阵Ai的列数或Ai-1的行数
+ *m[i][j]:纪录Ai - Aj的矩阵连乘的最小代价
+ *s[i][j]:纪录Ai - Aj之间得到最小连乘代价时的分割点
+ */
+void MatrixChainOrder(int p[], int m[][LENGTH], int s[][LENGTH])
+{
+    int i, j, k, len, q;
+
+    for(i=0; i<LENGTH; i++)
+        m[i][i] = 0;
+    for(len=2; len<=LENGTH; len++)    //len为矩阵链的长度
+    {
+        for(i=0; i<(LENGTH-len+1); i++)
+        {
+            j = i + len - 1;
+            m[i][j] = INT_MAX;
+            //计算Ai - Aj最优代价
+            for(k=i; k<j; k++)
+            {
+                q = m[i][k] + m[k+1][j] +p[i]*p[k+1]*p[j+1];
+                if(q < m[i][j])
+                {
+                    m[i][j] = q;
+                    s[i][j] = k;
+                }
+            }
+        }
+    }
+}
+
+void PrintOptimalParens(int s[][LENGTH], int i, int j)
+{
+    if(i == j)
+        printf("A%d", i);
+    else
+    {
+        printf("(");
+        PrintOptimalParens(s, i, s[i][j]);
+        PrintOptimalParens(s, s[i][j]+1, j);
+        printf(")");
+    }
+}
+
+int main(int argc, char **argv)
+{
+    int p[LENGTH+1] = {30, 35, 15, 5, 10, 20, 25};
+    int m[LENGTH][LENGTH];
+    int s[LENGTH][LENGTH];
+
+    MatrixChainOrder(p, m, s);
+    PrintOptimalParens(s, 0, LENGTH-1);
+    printf(" ");
+
+    return 0;
+}
+————————————————
+原文链接：https://blog.csdn.net/ujs_abc/java/article/details/2076876
